@@ -1,4 +1,4 @@
-<img width="1919" height="1079" alt="Screenshot 2026-08-18 212610" src="https://github.com/user-attachments/assets/a816a0fc-fc3e-455b-aa5c-c8bda604cf81" /># 📚 DocuMind AI — Multi-PDF RAG Chatbot
+<img width="1919" height="1079" alt="Screenshot 2026-08-18 212549" src="https://github.com/user-attachments/assets/cd5c216d-e753-4741-beef-19ca254c4604" /># 📚 DocuMind AI — Multi-PDF RAG Chatbot
 
 **DocuMind AI** is an AI-powered **Multi-PDF Question Answering Chatbot** built using **Retrieval-Augmented Generation (RAG)**. It allows users to work with multiple PDF documents and ask natural-language questions based specifically on their content.
 
