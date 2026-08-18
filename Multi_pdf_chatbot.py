@@ -1,3 +1,6 @@
+# ------------------------------------------------------------ DucuMind AI - Multi Pdf Chatbot ---------------------------------------------------------------------------
+
+
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -30,7 +33,7 @@ for pdf_path in ["RGPV_ML_Detailed_Answers.pdf","RGPV_Static_Dynamic_Interconnec
 
 # text splitting
 
-splitter = RecursiveCharacterTextSplitter(chunk_size = 1000 , chunk_overlap =200)
+splitter = RecursiveCharacterTextSplitter(chunk_size = 1500 , chunk_overlap =300)
 chunks = splitter.split_documents(documents)  # use split bcz getting document not plain text
 # print(chunks)
 
@@ -45,27 +48,63 @@ vector_store = FAISS.from_documents(chunks, embedding)
 
 
 # retrieval 
-retriever = vector_store.as_retriever(search_type = "similarity" , search_kwargs ={"k":4})
+retriever = vector_store.as_retriever(search_type = "similarity" , search_kwargs ={"k":8})
 
 
 # augmentation
 
 # prompt 
 model = ChatGroq(model="openai/gpt-oss-20b")
-prompt = PromptTemplate (
-template= """ You are a helpful assistant.
-      Answer ONLY from the provided pdf context.
-      If the context is insufficient, just say you don't know.
-    context: {context}
-    question : {question}""",
-    input_variables= ["context","question" ]
+prompt = PromptTemplate(
+    template="""
+You are a helpful PDF question-answering assistant.
+
+Answer the question ONLY using the provided PDF context.
+
+Rules:
+1. Do not use outside knowledge.
+2. If the answer is present in the context, answer it clearly.
+3. If the answer is not present, say:
+   "I don't know based on the provided documents."
+4. Mention the PDF name and page number when possible.
+
+CONTEXT:
+{context}
+
+QUESTION:
+{question}
+
+ANSWER:
+""",
+    input_variables=["context", "question"]
 )
 
-
 # format docs 
-def format_docs(documents):
-    return "\n\n".join(doc.page_content for doc in documents)  # converted all content into one string
 
+def format_docs(documents):
+
+    formatted_docs = []
+
+    for doc in documents:
+
+        pdf_name = doc.metadata.get(
+            "pdf_name",
+            doc.metadata.get("source", "Unknown")
+        )
+
+        page = doc.metadata.get("page", 0) + 1
+
+        formatted_docs.append(
+            f"""
+PDF: {pdf_name}
+PAGE: {page}
+
+CONTENT:
+{doc.page_content}
+"""
+        )
+
+    return "\n\n--------------------\n\n".join(formatted_docs)
 
 # chain 
 
